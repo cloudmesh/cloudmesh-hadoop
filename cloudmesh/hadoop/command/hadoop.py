@@ -1,12 +1,12 @@
 from __future__ import print_function
 from cloudmesh.shell.command import command
 from cloudmesh.shell.command import PluginCommand
-from cloudmesh.hadoop.api.manager import Manager
 from cloudmesh.common.console import Console
 from cloudmesh.common.util import path_expand
 from pprint import pprint
 from cloudmesh.common.debug import VERBOSE
-
+from cloudmesh.cluster.Cluster import Cluster
+from cloudmesh.common.Printer import Printer
 class HadoopCommand(PluginCommand):
 
     # noinspection PyUnusedLocal
@@ -16,31 +16,26 @@ class HadoopCommand(PluginCommand):
         ::
 
           Usage:
-                hadoop --file=FILE
-                hadoop list
+                hadoop [LABEL]
 
-          This command does some useful things.
+          Deploys hadoop on a cloud cluster.
 
           Arguments:
-              FILE   a file name
+              LABEL   A cluster label.
 
-          Options:
-              -f      specify the file
+          Description:
+              
+              hadoop [LABEL]
 
+                  Deploy hadoop onto a cluster.  Automatically determines master and client nodes.  If cluster name not specified, 
+                  cluster is created automatically.
         """
-        arguments.FILE = arguments['--file'] or None
-
         VERBOSE(arguments)
 
-        m = Manager()
+        map_parameters(arguments, LABEL)
+        
+        cluster = Cluster(printer=Printer.write, name=arguments.cloud)
+        if arguments.LABEL:
+            cluster.deploy("../images/")
 
-        if arguments.FILE:
-            print("option a")
-            m.list(path_expand(arguments.FILE))
-
-        elif arguments.list:
-            print("option b")
-            m.list("just calling list without parameter")
-
-        Console.error("This is just a sample")
         return ""
